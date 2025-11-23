@@ -677,57 +677,8 @@ def toggle_bot():
     status_manager.set_status(new_status)
     return jsonify({'status': new_status})
 
-def run_telegram_bot():
-    """Запускает Telegram бота в отдельном потоке"""
-    try:
-        application = Application.builder().token(BOT_TOKEN).build()
-
-        # Команды
-        application.add_handler(CommandHandler("start", start_command))
-        application.add_handler(CommandHandler("help", help_command))
-        application.add_handler(CommandHandler("rules", rules_command))
-        application.add_handler(CommandHandler("contact", contact_admin_command))
-        application.add_handler(CommandHandler("donate", donate_command))
-        application.add_handler(CommandHandler("stats", quick_stats_command))
-
-        # Обработчики кнопок
-        application.add_handler(MessageHandler(filters.Text([
-            "📝 Написать пост", "📜 Правила канала",
-            "🆘 Помощь", "💌 Связь с админом",
-            "💝 Поддержать разработчика",
-            "📈 Быстрая статистика"
-        ]), button_handler))
-
-        # Обработчики сообщений
-        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-        application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-
-        print("🎊 Бот «В 1 школе любят» запущен и готов к работе!")
-        print("📊 Система статистики активирована!")
-        print("🌐 API управления статусом доступно!")
-
-        # Запуск бота
-        application.run_polling()
-
-    except Exception as e:
-        logger.error(f"Критическая ошибка при запуске бота: {e}")
-
-def main():
-    """Запускает и Telegram бота и Flask сервер"""
-    import threading
-    
-    # Запускаем Telegram бота в отдельном потоке
-    bot_thread = threading.Thread(target=run_telegram_bot, daemon=True)
-    bot_thread.start()
-    
-    print("✅ Telegram бот запущен в фоновом режиме!")
-    print("🚀 Flask сервер запускается...")
-
-# Запускаем и бота и Flask сервер
+# Запускаем Flask сервер (для Render)
 if __name__ == "__main__":
-    # Запускаем бота в фоне
-    main()
-    
-    # Запускаем Flask сервер (для Render)
+    print("🚀 Flask сервер запускается...")
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
